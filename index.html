@@ -1,0 +1,2520 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abdun Nur Grocery – Accounting System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer>
+    </script>
+    <style>
+        :root {
+            --green: #1a7a3c;
+            --green-light: #25a356;
+            --green-bg: #e8f5ee;
+            --red: #c0392b;
+            --red-light: #e74c3c;
+            --red-bg: #fdecea;
+            --gold: #f0a500;
+            --dark: #1a1a2e;
+            --dark2: #16213e;
+            --text: #2d3748;
+            --muted: #718096;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --surface: #f8fafc;
+            --card: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--surface);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* LOGIN OVERLAY */
+        #loginOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #0f5c2a 0%, #1a7a3c 50%, #0d4f24 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.6s, visibility 0.6s;
+        }
+        #loginOverlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .login-box {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+        .login-box .logo-circle {
+            width: 72px;
+            height: 72px;
+            background: var(--green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 900;
+            font-size: 28px;
+            color: white;
+            margin: 0 auto 16px;
+            border: 3px solid var(--gold);
+        }
+        .login-box h2 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        .login-box .sub {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .login-box .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        .login-box .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .login-box .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .login-box .form-group input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(26, 122, 60, 0.12);
+        }
+        .login-box .btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+        }
+        .login-box .login-error {
+            color: var(--red);
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #0f5c2a 0%, #1a7a3c 50%, #0d4f24 100%);
+            color: white;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .logo-circle {
+            width: 52px;
+            height: 52px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 900;
+            font-size: 22px;
+            color: var(--green);
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 0 2px rgba(240, 165, 0, 0.3);
+            flex-shrink: 0;
+        }
+        .logo-text h1 {
+            font-family: 'Cairo', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+        .logo-text .arabic {
+            font-size: 14px;
+            opacity: 0.85;
+            font-weight: 400;
+            margin-top: 1px;
+        }
+        .logo-text .location {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 2px;
+            letter-spacing: 0.3px;
+        }
+        .header-date {
+            text-align: right;
+            font-size: 12px;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        .header-date .date-big {
+            font-size: 16px;
+            font-weight: 700;
+            opacity: 1;
+        }
+
+        /* NAV TABS */
+        .nav-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .nav-tab {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 14px;
+            text-align: center;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .nav-tab.active {
+            color: white;
+            border-bottom-color: var(--gold);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .nav-tab .tab-icon {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* PAGES */
+        .page {
+            display: none;
+            padding: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* STAT CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .stat-icon.green {
+            background: var(--green-bg);
+        }
+        .stat-icon.red {
+            background: var(--red-bg);
+        }
+        .stat-icon.gold {
+            background: #fff8e1;
+        }
+        .stat-icon.blue {
+            background: #e3f2fd;
+        }
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .stat-value.green {
+            color: var(--green);
+        }
+        .stat-value.red {
+            color: var(--red);
+        }
+        .stat-value.gold {
+            color: var(--gold);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        /* SECTION TITLE */
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, var(--green-light), transparent);
+            margin-left: 4px;
+        }
+
+        /* FORM CARD */
+        .form-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            background: var(--surface);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(26, 122, 60, 0.12);
+            background: white;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-green {
+            background: var(--green);
+            color: white;
+        }
+        .btn-green:hover {
+            background: var(--green-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(26, 122, 60, 0.4);
+        }
+        .btn-red {
+            background: var(--red);
+            color: white;
+        }
+        .btn-red:hover {
+            background: var(--red-light);
+        }
+        .btn-outline {
+            background: white;
+            border: 1.5px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+        .btn-gold {
+            background: var(--gold);
+            color: white;
+        }
+        .btn-gold:hover {
+            background: #d4940a;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* TABLE */
+        .table-card {
+            background: var(--card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+        }
+        .table-header {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .table-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .search-input {
+            padding: 7px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            width: 200px;
+        }
+        .search-input:focus {
+            border-color: var(--green);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: linear-gradient(135deg, #0f5c2a, #1a7a3c);
+            color: white;
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        td {
+            padding: 11px 14px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover td {
+            background: var(--green-bg);
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-green {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        .badge-red {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+        .badge-gold {
+            background: #fff8e1;
+            color: #b7800a;
+        }
+        .badge-blue {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .badge-purple {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        .amount-pos {
+            color: var(--green);
+            font-weight: 700;
+        }
+        .amount-neg {
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--muted);
+        }
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            transform: translateX(200%);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            max-width: 320px;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .toast.green {
+            border-left: 4px solid var(--green-light);
+        }
+        .toast.red {
+            border-left: 4px solid var(--red-light);
+        }
+
+        /* CUSTOMER CARD */
+        .customer-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .customer-card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .customer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--green), var(--green-light));
+        }
+        .customer-card.has-debt::before {
+            background: linear-gradient(to right, var(--red), var(--red-light));
+        }
+        .customer-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        .cust-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .cust-phone {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+        .cust-debt {
+            font-size: 20px;
+            font-weight: 800;
+        }
+        .cust-debt.pos {
+            color: var(--green);
+        }
+        .cust-debt.neg {
+            color: var(--red);
+        }
+        .cust-label {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* SUPPLIER CARDS */
+        .supplier-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 16px;
+        }
+        .supplier-card {
+            background: var(--surface);
+            border-radius: 14px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .supplier-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #f0a500, #ffc107);
+        }
+        .supplier-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        .sup-name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .sup-contact {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        .sup-balance {
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .sup-balance.owe {
+            color: var(--red);
+        }
+        .sup-balance.clear {
+            color: var(--green);
+        }
+        .sup-meta {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        /* RECEIPT */
+        .receipt {
+            background: white;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            font-family: 'Cairo', monospace;
+        }
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px dashed #ddd;
+            padding-bottom: 14px;
+            margin-bottom: 14px;
+        }
+        .receipt-logo {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--green);
+        }
+        .receipt-arabic {
+            font-size: 14px;
+            color: var(--muted);
+        }
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
+        }
+        .receipt-total {
+            border-top: 2px dashed #ddd;
+            margin-top: 10px;
+            padding-top: 10px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-close {
+            margin-left: auto;
+            background: var(--surface);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:hover {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        /* SUMMARY BOX */
+        .summary-box {
+            background: linear-gradient(135deg, #0f5c2a, #1a7a3c);
+            color: white;
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-box::after {
+            content: 'بقالة عبدون نور';
+            position: absolute;
+            right: 20px;
+            bottom: -8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 60px;
+            font-weight: 900;
+            opacity: 0.06;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .sum-val {
+            font-size: 24px;
+            font-weight: 800;
+        }
+        .sum-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        /* REMINDER PANEL */
+        .reminder-panel {
+            background: var(--card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .reminder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .reminder-item:last-child {
+            border-bottom: none;
+        }
+        .reminder-msg {
+            font-size: 14px;
+            flex: 1;
+            min-width: 200px;
+        }
+        .reminder-msg .bn {
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .reminder-msg .en {
+            font-size: 12px;
+            color: var(--muted);
+            display: block;
+        }
+        .reminder-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* LOGOUT */
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* PRINT */
+        @media print {
+            .header,
+            .nav-tabs,
+            .no-print {
+                display: none !important;
+            }
+            .page {
+                display: block !important;
+                padding: 0;
+            }
+            .print-area {
+                display: block;
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .header-inner {
+                padding: 10px 16px;
+            }
+            .page {
+                padding: 14px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .logo-text h1 {
+                font-size: 16px;
+            }
+            .logo-text .arabic {
+                font-size: 12px;
+            }
+            table {
+                font-size: 12px;
+            }
+            td,
+            th {
+                padding: 8px 10px;
+            }
+            .login-box {
+                padding: 24px;
+            }
+            .reminder-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 16px 0;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-2 {
+            margin-top: 8px;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .w-full {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOGIN OVERLAY ===== -->
+    <div id="loginOverlay">
+        <div class="login-box">
+            <div class="logo-circle">G</div>
+            <h2>Abdun Nur Grocery</h2>
+            <p class="sub">بقالة عبدون نور · Accounting System</p>
+            <div class="form-group">
+                <label>👤 Username</label>
+                <input type="text" id="loginUser" value="Khaled" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>🔒 Password</label>
+                <input type="password" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+            </div>
+            <button class="btn btn-green" onclick="doLogin()">🔐 Login</button>
+            <div class="login-error" id="loginError">❌ Invalid username or password</div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast">✅ Done!</div>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal">
+            <div class="modal-title">
+                👤 Customer Transactions
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <div class="header" id="appHeader">
+        <div class="header-inner">
+            <div class="logo-area">
+                <div class="logo-circle">G</div>
+                <div class="logo-text">
+                    <h1>ABDUN NUR GROCERY</h1>
+                    <div class="arabic">بقالة عبدون نور</div>
+                    <div class="location">📍 Frij Al Murar, Dubai – U.A.E</div>
+                </div>
+            </div>
+            <div class="flex-center">
+                <div class="header-date">
+                    <div class="date-big" id="currentDate">–</div>
+                    <div id="currentTime">–</div>
+                </div>
+                <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
+            </div>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPage('dashboard')">
+                <span class="tab-icon">📊</span>Dashboard
+            </button>
+            <button class="nav-tab" onclick="showPage('sales')">
+                <span class="tab-icon">🛒</span>New Sale
+            </button>
+            <button class="nav-tab" onclick="showPage('baki')">
+                <span class="tab-icon">📋</span>Baki / Credit
+            </button>
+            <button class="nav-tab" onclick="showPage('customers')">
+                <span class="tab-icon">👥</span>Customers
+            </button>
+            <button class="nav-tab" onclick="showPage('expenses')">
+                <span class="tab-icon">💸</span>Expenses
+            </button>
+            <button class="nav-tab" onclick="showPage('suppliers')">
+                <span class="tab-icon">🏭</span>Suppliers
+            </button>
+            <button class="nav-tab" onclick="showPage('reminders')">
+                <span class="tab-icon">🔔</span>Reminders
+            </button>
+            <button class="nav-tab" onclick="showPage('reports')">
+                <span class="tab-icon">📈</span>Reports
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <div class="page active" id="page-dashboard">
+        <div class="summary-box">
+            <div class="sum-item">
+                <div class="sum-val" id="sum-total-sales">AED 0</div>
+                <div class="sum-label">💰 Total Sales</div>
+            </div>
+            <div class="sum-item">
+                <div class="sum-val" id="sum-total-baki">AED 0</div>
+                <div class="sum-label">⚠️ Total Baki</div>
+            </div>
+            <div class="sum-item">
+                <div class="sum-val" id="sum-collected">AED 0</div>
+                <div class="sum-label">✅ Collected</div>
+            </div>
+            <div class="sum-item">
+                <div class="sum-val" id="sum-expenses">AED 0</div>
+                <div class="sum-label">💸 Expenses</div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon green">🛒</div>
+                <div>
+                    <div class="stat-value green" id="dash-sales-today">0</div>
+                    <div class="stat-label">Sales Today</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">📋</div>
+                <div>
+                    <div class="stat-value red" id="dash-baki-count">0</div>
+                    <div class="stat-label">Baki Customers</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon gold">👥</div>
+                <div>
+                    <div class="stat-value gold" id="dash-customers">0</div>
+                    <div class="stat-label">Total Customers</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue">📦</div>
+                <div>
+                    <div class="stat-value" id="dash-txn-count">0</div>
+                    <div class="stat-label">Transactions</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">📰 Recent Transactions</div>
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Customer</th><th>Type</th><th>Amount</th><th>Note</th></tr>
+                </thead>
+                <tbody id="dash-recent-tbody">
+                    <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No transactions yet</p></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== NEW SALE ==================== -->
+    <div class="page" id="page-sales">
+        <div class="section-title">🛒 New Sale Entry</div>
+        <div class="form-card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" id="sale-customer" placeholder="Walk-in / Name" list="customer-datalist">
+                    <datalist id="customer-datalist"></datalist>
+                </div>
+                <div class="form-group">
+                    <label>Phone (Optional)</label>
+                    <input type="text" id="sale-phone" placeholder="056 XXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="sale-date">
+                </div>
+                <div class="form-group">
+                    <label>Amount (AED)</label>
+                    <input type="number" id="sale-amount" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Payment Type</label>
+                    <select id="sale-payment">
+                        <option value="cash">💵 Cash</option>
+                        <option value="card">💳 Card</option>
+                        <option value="baki">📋 Baki (Credit)</option>
+                        <option value="partial">⚡ Partial Payment</option>
+                    </select>
+                </div>
+                <div class="form-group" id="partial-group" style="display:none;">
+                    <label>Cash Paid (AED)</label>
+                    <input type="number" id="sale-paid" placeholder="0.00" min="0" step="0.01">
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                <label>Items / Notes</label>
+                <textarea id="sale-notes" placeholder="e.g. Rice 5kg, Oil 2L, Sugar 1kg..."></textarea>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-green" onclick="addSale()">✅ Save Sale</button>
+                <button class="btn btn-outline" onclick="clearSaleForm()">🗑 Clear</button>
+                <button class="btn btn-gold" onclick="downloadInvoice()">📄 Download Invoice</button>
+            </div>
+        </div>
+
+        <div id="receipt-preview" style="display:none;">
+            <div class="section-title">🖨 Invoice Preview</div>
+            <div class="receipt" id="receipt-box"></div>
+            <div class="btn-row" style="margin-top:12px;">
+                <button class="btn btn-gold" onclick="downloadInvoice()">📄 Download PDF</button>
+                <button class="btn btn-outline" onclick="document.getElementById('receipt-preview').style.display='none'">✕ Close</button>
+            </div>
+        </div>
+
+        <div class="section-title">📋 Today's Sales</div>
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr><th>Time</th><th>Customer</th><th>Amount</th><th>Payment</th><th>Notes</th><th>Action</th></tr>
+                </thead>
+                <tbody id="today-sales-tbody">
+                    <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🛒</div><p>No sales today</p></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== BAKI / CREDIT ==================== -->
+    <div class="page" id="page-baki">
+        <div class="section-title">📋 Baki / Credit Management</div>
+        <div class="form-card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" id="baki-customer" placeholder="Customer name" list="customer-datalist">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" id="baki-phone" placeholder="056 XXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="baki-date">
+                </div>
+                <div class="form-group">
+                    <label>Amount (AED)</label>
+                    <input type="number" id="baki-amount" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="baki-type">
+                        <option value="baki">📋 New Baki (Add Debt)</option>
+                        <option value="payment">✅ Payment Received</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Settlement Month (for month-end)</label>
+                    <input type="month" id="baki-settlement-month">
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                <label>Notes</label>
+                <textarea id="baki-notes" placeholder="Items or remarks..."></textarea>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-green" onclick="addBakiEntry()">✅ Save Entry</button>
+                <button class="btn btn-outline" onclick="clearBakiForm()">🗑 Clear</button>
+            </div>
+        </div>
+
+        <div class="section-title">⚠️ Active Baki Accounts</div>
+        <div class="table-card">
+            <div class="table-header">
+                <h3>Baki List</h3>
+                <input class="search-input" type="text" placeholder="🔍 Search customer..." onkeyup="filterBaki(this.value)">
+            </div>
+            <table>
+                <thead>
+                    <tr><th>#</th><th>Customer</th><th>Phone</th><th>Total Baki</th><th>Last Date</th><th>Status</th><th>Action</th></tr>
+                </thead>
+                <tbody id="baki-tbody">
+                    <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📋</div><p>No baki records</p></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== CUSTOMERS ==================== -->
+    <div class="page" id="page-customers">
+        <div class="section-title">👥 Customer Directory</div>
+        <div class="form-card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="cust-name" placeholder="Customer name">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" id="cust-phone" placeholder="056 XXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>Address / Flat</label>
+                    <input type="text" id="cust-address" placeholder="Flat no / Building">
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <input type="text" id="cust-notes" placeholder="Any notes...">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-green" onclick="addCustomer()">➕ Add Customer</button>
+            </div>
+        </div>
+
+        <div class="customer-cards-grid" id="customers-grid">
+            <div class="empty-state" style="grid-column:1/-1">
+                <div class="empty-icon">👥</div>
+                <p>No customers added yet</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EXPENSES ==================== -->
+    <div class="page" id="page-expenses">
+        <div class="section-title">💸 Shop Expenses</div>
+        <div class="form-card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="exp-date">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="exp-category">
+                        <option value="rent">🏠 Rent</option>
+                        <option value="electricity">⚡ Electricity / DEWA</option>
+                        <option value="water">💧 Water</option>
+                        <option value="staff">👷 Staff Salary</option>
+                        <option value="stock">📦 Stock Purchase</option>
+                        <option value="delivery">🛵 Delivery</option>
+                        <option value="phone">📱 Phone / Internet</option>
+                        <option value="other">🔧 Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount (AED)</label>
+                    <input type="number" id="exp-amount" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="exp-desc" placeholder="Details...">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-red" onclick="addExpense()">💸 Add Expense</button>
+            </div>
+        </div>
+
+        <div class="section-title">📋 Expense Records</div>
+        <div class="table-card">
+            <div class="table-header">
+                <h3>All Expenses</h3>
+                <span class="badge badge-red" id="exp-total-badge">Total: AED 0</span>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th>Action</th></tr>
+                </thead>
+                <tbody id="exp-tbody">
+                    <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">💸</div><p>No expenses recorded</p></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== SUPPLIERS ==================== -->
+    <div class="page" id="page-suppliers">
+        <div class="section-title">🏭 Supplier Management</div>
+        <div class="form-card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Supplier Name</label>
+                    <input type="text" id="sup-name" placeholder="e.g. Al Madina Trading">
+                </div>
+                <div class="form-group">
+                    <label>Contact Person</label>
+                    <input type="text" id="sup-contact" placeholder="Name of rep">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" id="sup-phone" placeholder="05X XXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp</label>
+                    <input type="text" id="sup-whatsapp" placeholder="05X XXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="sup-category">
+                        <option value="grocery">🛒 Grocery / Dry Goods</option>
+                        <option value="vegetables">🥦 Vegetables & Fruits</option>
+                        <option value="fish">🐟 Fish & Meat</option>
+                        <option value="dairy">🥛 Dairy & Eggs</option>
+                        <option value="oil">🫙 Oil & Ghee</option>
+                        <option value="beverages">🥤 Beverages</option>
+                        <option value="frozen">🧊 Frozen Foods</option>
+                        <option value="cleaning">🧹 Cleaning Supplies</option>
+                        <option value="other">📦 Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Area / Location</label>
+                    <input type="text" id="sup-area" placeholder="e.g. Deira, Al Quoz...">
+                </div>
+                <div class="form-group">
+                    <label>Credit Limit (AED)</label>
+                    <input type="number" id="sup-credit" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Payment Terms</label>
+                    <select id="sup-terms">
+                        <option value="cash">Cash on Delivery</option>
+                        <option value="7days">7 Days Credit</option>
+                        <option value="15days">15 Days Credit</option>
+                        <option value="30days">30 Days Credit</option>
+                        <option value="weekly">Weekly Payment</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                <label>Notes</label>
+                <textarea id="sup-notes" placeholder="Products they supply, delivery schedule, etc..."></textarea>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-green" onclick="addSupplier()">➕ Add Supplier</button>
+                <button class="btn btn-outline" onclick="clearSupplierForm()">🗑 Clear</button>
+            </div>
+        </div>
+
+        <div class="section-title">💳 Record Supplier Payment</div>
+        <div class="form-card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Supplier</label>
+                    <select id="sup-pay-name" style="width:100%">
+                        <option value="">-- Select Supplier --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="sup-pay-date">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="sup-pay-type">
+                        <option value="purchase">📦 Purchase (We owe them)</option>
+                        <option value="payment">✅ Payment Made (We paid)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount (AED)</label>
+                    <input type="number" id="sup-pay-amount" placeholder="0.00" min="0" step="0.01">
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                <label>Description (Invoice #, items...)</label>
+                <textarea id="sup-pay-notes" placeholder="Invoice no, items purchased..."></textarea>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-green" onclick="addSupplierPayment()">✅ Record</button>
+            </div>
+        </div>
+
+        <div class="section-title">📋 Supplier Directory</div>
+        <div class="table-header" style="background:var(--card);border-radius:12px 12px 0 0;border:1px solid var(--border);border-bottom:none;padding:12px 16px;">
+            <span></span>
+            <input class="search-input" type="text" placeholder="🔍 Search supplier..." onkeyup="filterSuppliers(this.value)">
+        </div>
+        <div class="supplier-cards-grid" id="suppliers-grid">
+            <div class="empty-state" style="grid-column:1/-1">
+                <div class="empty-icon">🏭</div>
+                <p>No suppliers added yet</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== REMINDERS ==================== -->
+    <div class="page" id="page-reminders">
+        <div class="section-title">🔔 Reminder Center</div>
+
+        <!-- Upcoming Reminders -->
+        <div class="form-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                <h3 style="font-size:16px;font-weight:700;">📅 Upcoming Reminders</h3>
+                <span class="badge badge-gold" id="reminder-badge">Next: 2nd & 10th of each month</span>
+            </div>
+            <div id="reminder-list">
+                <div class="empty-state"><div class="empty-icon">🔔</div><p>No outstanding baki – all clear! 🎉</p></div>
+            </div>
+        </div>
+
+        <!-- Reminder Settings -->
+        <div class="form-card">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">⚙️ Reminder Settings</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Reminder Day 1</label>
+                    <input type="number" id="rem-day1" value="2" min="1" max="28">
+                </div>
+                <div class="form-group">
+                    <label>Reminder Day 2</label>
+                    <input type="number" id="rem-day2" value="10" min="1" max="28">
+                </div>
+                <div class="form-group">
+                    <label>Message Language</label>
+                    <select id="rem-lang">
+                        <option value="both">🌐 Both (Bengali + English)</option>
+                        <option value="bn">🇧🇩 Bengali Only</option>
+                        <option value="en">🇬🇧 English Only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-green" onclick="saveReminderSettings()">💾 Save Settings</button>
+                <button class="btn btn-gold" onclick="sendBulkReminders()">📤 Send Bulk Reminders (WhatsApp)</button>
+            </div>
+        </div>
+
+        <!-- Reminder History -->
+        <div class="section-title">📜 Reminder History</div>
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Customer</th><th>Type</th><th>Status</th><th>Message</th></tr>
+                </thead>
+                <tbody id="reminder-history-tbody">
+                    <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No reminders sent yet</p></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== REPORTS ==================== -->
+    <div class="page" id="page-reports">
+        <div class="section-title">📈 Business Reports</div>
+        <div class="form-card">
+            <div class="flex-between">
+                <div class="form-grid" style="flex:1">
+                    <div class="form-group">
+                        <label>From Date</label>
+                        <input type="date" id="rep-from">
+                    </div>
+                    <div class="form-group">
+                        <label>To Date</label>
+                        <input type="date" id="rep-to">
+                    </div>
+                </div>
+                <div class="btn-row" style="margin-top:20px;">
+                    <button class="btn btn-green" onclick="generateReport()">📊 Generate</button>
+                    <button class="btn btn-outline" onclick="printReport()">🖨 Print</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="report-output">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon green">💰</div>
+                    <div><div class="stat-value green" id="rep-sales">AED 0</div><div class="stat-label">Total Sales</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">📋</div>
+                    <div><div class="stat-value red" id="rep-baki">AED 0</div><div class="stat-label">Total Baki</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div><div class="stat-value green" id="rep-collected">AED 0</div><div class="stat-label">Baki Collected</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">💸</div>
+                    <div><div class="stat-value red" id="rep-expenses">AED 0</div><div class="stat-label">Expenses</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon gold">💎</div>
+                    <div><div class="stat-value gold" id="rep-profit">AED 0</div><div class="stat-label">Net Profit</div></div>
+                </div>
+            </div>
+
+            <div class="section-title">📋 Transaction History</div>
+            <div class="table-card">
+                <table>
+                    <thead>
+                        <tr><th>Date</th><th>Customer</th><th>Type</th><th>Amount</th><th>Payment</th><th>Notes</th></tr>
+                    </thead>
+                    <tbody id="rep-tbody">
+                        <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📊</div><p>Generate report to see data</p></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================== DATA STORE =====================
+        let data = JSON.parse(localStorage.getItem('abdunnur_data') || 'null') || {
+            sales: [],
+            baki: [],
+            customers: [],
+            expenses: [],
+            suppliers: [],
+            supplierPayments: [],
+            reminders: [],
+            reminderSettings: { day1: 2, day2: 10, lang: 'both' },
+            bakiSettlements: [],
+        };
+
+        function save() {
+            localStorage.setItem('abdunnur_data', JSON.stringify(data));
+        }
+
+        // ===================== LOGIN =====================
+        function doLogin() {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            if (user === 'Khaled' && pass === 'Janina123') {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                sessionStorage.setItem('loggedIn', 'true');
+                toast('Welcome, Khaled!', 'green');
+                refreshAll();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+                toast('Invalid credentials', 'red');
+            }
+        }
+
+        function doLogout() {
+            sessionStorage.removeItem('loggedIn');
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('loginPass').value = '';
+            toast('Logged out', 'red');
+        }
+
+        // Check session on load
+        window.onload = function() {
+            if (sessionStorage.getItem('loggedIn') === 'true') {
+                document.getElementById('loginOverlay').classList.add('hidden');
+            }
+            const today = new Date().toISOString().split('T')[0];
+            ['sale-date', 'baki-date', 'exp-date', 'rep-from', 'rep-to', 'sup-pay-date'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = today;
+            });
+            // settlement month default
+            const sm = document.getElementById('baki-settlement-month');
+            if (sm) sm.value = today.slice(0, 7);
+
+            // Load reminder settings
+            if (data.reminderSettings) {
+                document.getElementById('rem-day1').value = data.reminderSettings.day1 || 2;
+                document.getElementById('rem-day2').value = data.reminderSettings.day2 || 10;
+                document.getElementById('rem-lang').value = data.reminderSettings.lang || 'both';
+            }
+
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            document.getElementById('sale-payment').onchange = function() {
+                document.getElementById('partial-group').style.display = this.value === 'partial' ? 'block' : 'none';
+            };
+
+            refreshAll();
+            renderReminders();
+        };
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-AE', { weekday: 'short',
+                day: '2-digit', month: 'short', year: 'numeric' });
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-AE', { hour: '2-digit',
+                minute: '2-digit' });
+        }
+
+        // ===================== NAVIGATION =====================
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('page-' + id).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if (id === 'reminders') renderReminders();
+            refreshAll();
+        }
+
+        // ===================== TOAST =====================
+        function toast(msg, type = 'green') {
+            const t = document.getElementById('toast');
+            t.textContent = (type === 'green' ? '✅ ' : '❌ ') + msg;
+            t.className = 'toast show ' + type;
+            setTimeout(() => t.className = 'toast', 2800);
+        }
+
+        // ===================== CUSTOMERS =====================
+        function getCustomerNames() {
+            const names = new Set();
+            data.customers.forEach(c => names.add(c.name));
+            data.sales.forEach(s => s.customer && names.add(s.customer));
+            data.baki.forEach(b => b.customer && names.add(b.customer));
+            return [...names];
+        }
+
+        function updateDatalist() {
+            const dl = document.getElementById('customer-datalist');
+            if (!dl) return;
+            dl.innerHTML = getCustomerNames().map(n => `<option value="${n}">`).join('');
+        }
+
+        function addCustomer() {
+            const name = document.getElementById('cust-name').value.trim();
+            if (!name) { toast('Enter customer name', 'red'); return; }
+            if (data.customers.find(c => c.name.toLowerCase() === name.toLowerCase())) {
+                toast('Customer already exists', 'red');
+                return;
+            }
+            data.customers.push({
+                id: Date.now(),
+                name,
+                phone: document.getElementById('cust-phone').value.trim(),
+                address: document.getElementById('cust-address').value.trim(),
+                notes: document.getElementById('cust-notes').value.trim(),
+                date: new Date().toISOString()
+            });
+            save();
+            toast('Customer added!');
+            ['cust-name', 'cust-phone', 'cust-address', 'cust-notes'].forEach(id => document.getElementById(id).value =
+            '');
+            renderCustomers();
+        }
+
+        function renderCustomers() {
+            updateDatalist();
+            const grid = document.getElementById('customers-grid');
+            const allNames = getCustomerNames();
+            if (!allNames.length) {
+                grid.innerHTML =
+                    '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👥</div><p>No customers added yet</p></div>';
+                return;
+            }
+            grid.innerHTML = allNames.map(name => {
+                const bal = getCustomerBalance(name);
+                const cust = data.customers.find(c => c.name === name) || {};
+                const hasDebt = bal > 0;
+                return `<div class="customer-card ${hasDebt ? 'has-debt' : ''}" onclick="showCustomerModal('${name}')">
+              <div class="cust-name">👤 ${name}</div>
+              <div class="cust-phone">${cust.phone || '–'} ${cust.address ? '· ' + cust.address : ''}</div>
+              <div class="cust-debt ${hasDebt ? 'neg' : 'pos'}">AED ${bal.toFixed(2)}</div>
+              <div class="cust-label">${hasDebt ? '⚠️ Outstanding Baki' : '✅ Clear'}</div>
+            </div>`;
+            }).join('');
+        }
+
+        function getCustomerBalance(name) {
+            let bal = 0;
+            data.baki.filter(b => b.customer === name).forEach(b => {
+                bal += b.type === 'baki' ? b.amount : -b.amount;
+            });
+            return Math.max(0, bal);
+        }
+
+        function showCustomerModal(name) {
+            const entries = data.baki.filter(b => b.customer === name);
+            const sales = data.sales.filter(s => s.customer === name);
+            const bal = getCustomerBalance(name);
+            const cust = data.customers.find(c => c.name === name) || {};
+            let html = `<div style="margin-bottom:16px;">
+            <div style="font-size:18px;font-weight:800;">${name}</div>
+            <div style="color:var(--muted);font-size:13px;">${cust.phone || ''}</div>
+            <div style="font-size:22px;font-weight:800;color:${bal > 0 ? 'var(--red)' : 'var(--green)'}">AED ${bal.toFixed(2)}</div>
+            <div style="font-size:12px;color:var(--muted)">${bal > 0 ? '⚠️ Outstanding Baki' : '✅ All clear'}</div>
+          </div>
+          <div style="font-weight:700;margin-bottom:8px;">📋 Baki History</div>`;
+            if (entries.length) {
+                html += entries.map(e => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+              <span>${e.date} – ${e.notes || '–'} ${e.settlementMonth ? '📅 '+e.settlementMonth : ''}</span>
+              <span style="font-weight:700;color:${e.type==='baki'?'var(--red)':'var(--green)'}">
+                ${e.type==='baki' ? '+' : '-'}AED ${e.amount.toFixed(2)}
+              </span>
+            </div>`).join('');
+            } else html += '<div style="color:var(--muted);font-size:13px;">No baki entries</div>';
+
+            // Sales history
+            html += `<div style="font-weight:700;margin:16px 0 8px;">🛒 Sales History</div>`;
+            if (sales.length) {
+                html += sales.slice().reverse().slice(0, 10).map(s =>
+                    `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">
+                <span>${s.date} – ${s.notes || '–'}</span>
+                <span style="font-weight:700;color:var(--green)">AED ${s.amount.toFixed(2)}</span>
+              </div>`
+                ).join('');
+            } else html += '<div style="color:var(--muted);font-size:13px;">No sales</div>';
+
+            document.getElementById('modalContent').innerHTML = html;
+            document.getElementById('customerModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('customerModal').classList.remove('active');
+        }
+
+        // ===================== SALES =====================
+        function addSale() {
+            const customer = document.getElementById('sale-customer').value.trim() || 'Walk-in';
+            const amount = parseFloat(document.getElementById('sale-amount').value);
+            const payment = document.getElementById('sale-payment').value;
+            const date = document.getElementById('sale-date').value;
+            const notes = document.getElementById('sale-notes').value.trim();
+            const phone = document.getElementById('sale-phone').value.trim();
+
+            if (!amount || amount <= 0) { toast('Enter valid amount', 'red'); return; }
+            if (!date) { toast('Select date', 'red'); return; }
+
+            let paidAmount = amount;
+            let bakiAmount = 0;
+
+            if (payment === 'baki') {
+                paidAmount = 0;
+                bakiAmount = amount;
+            } else if (payment === 'partial') {
+                paidAmount = parseFloat(document.getElementById('sale-paid').value) || 0;
+                bakiAmount = amount - paidAmount;
+            }
+
+            const sale = { id: Date.now(), customer, phone, amount, paidAmount, bakiAmount, payment, date, notes,
+                time: new Date().toLocaleTimeString() };
+            data.sales.push(sale);
+
+            if (bakiAmount > 0) {
+                const settlementMonth = document.getElementById('baki-settlement-month').value || date.slice(0, 7);
+                data.baki.push({
+                    id: Date.now() + 1,
+                    customer,
+                    phone,
+                    amount: bakiAmount,
+                    type: 'baki',
+                    date,
+                    notes: `Sale baki: ${notes}`,
+                    settlementMonth: settlementMonth,
+                    settled: false
+                });
+            }
+
+            if (customer !== 'Walk-in' && !data.customers.find(c => c.name.toLowerCase() === customer.toLowerCase())) {
+                data.customers.push({ id: Date.now() + 2, name: customer, phone, address: '', notes: '',
+                    date: new Date().toISOString() });
+            }
+
+            save();
+            toast(`Sale AED ${amount.toFixed(2)} saved!`);
+            clearSaleForm();
+            refreshAll();
+        }
+
+        function clearSaleForm() {
+            ['sale-customer', 'sale-phone', 'sale-amount', 'sale-notes', 'sale-paid'].forEach(id => document.getElementById(
+                id).value = '');
+            document.getElementById('sale-payment').value = 'cash';
+            document.getElementById('partial-group').style.display = 'none';
+            document.getElementById('receipt-preview').style.display = 'none';
+        }
+
+        function downloadInvoice() {
+            const customer = document.getElementById('sale-customer').value || 'Walk-in';
+            const amount = parseFloat(document.getElementById('sale-amount').value) || 0;
+            const notes = document.getElementById('sale-notes').value || '–';
+            const payment = document.getElementById('sale-payment').value;
+            const date = document.getElementById('sale-date').value;
+            const box = document.getElementById('receipt-box');
+
+            if (!amount || amount <= 0) { toast('Enter amount first', 'red'); return; }
+
+            box.innerHTML = `
+            <div class="receipt-header">
+              <div class="receipt-logo">ABDUN NUR GROCERY</div>
+              <div class="receipt-arabic">بقالة عبدون نور</div>
+              <div style="font-size:11px;color:#888;margin-top:4px;">Frij Al Murar, Dubai – UAE</div>
+              <div style="font-size:11px;color:#888;">📞 056 5890709 | 055 2512587</div>
+            </div>
+            <div class="receipt-row"><span>📅 Date:</span><span>${date}</span></div>
+            <div class="receipt-row"><span>👤 Customer:</span><span>${customer}</span></div>
+            <div class="receipt-row"><span>📦 Items:</span><span>${notes}</span></div>
+            <div class="receipt-row"><span>💳 Payment:</span><span>${payment.toUpperCase()}</span></div>
+            <div class="receipt-row receipt-total"><span>💰 TOTAL:</span><span>AED ${amount.toFixed(2)}</span></div>
+            <div style="text-align:center;margin-top:14px;font-size:11px;color:#aaa;">🛵 FREE DELIVERY | شكراً لك</div>
+            <div style="text-align:center;font-size:9px;color:#ccc;margin-top:8px;">Generated: ${new Date().toLocaleString()}</div>
+          `;
+            document.getElementById('receipt-preview').style.display = 'block';
+
+            // Download PDF using html2pdf
+            const element = document.getElementById('receipt-box');
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `Invoice_${customer}_${date}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'a5', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save().then(() => {
+                toast('Invoice downloaded!', 'green');
+            }).catch(() => {
+                toast('Print to PDF instead', 'red');
+                window.print();
+            });
+        }
+
+        function deleteSale(id) {
+            if (!confirm('Delete this sale?')) return;
+            data.sales = data.sales.filter(s => s.id !== id);
+            save();
+            toast('Sale deleted', 'red');
+            refreshAll();
+        }
+
+        function renderTodaySales() {
+            const today = new Date().toISOString().split('T')[0];
+            const todaySales = data.sales.filter(s => s.date === today);
+            const tbody = document.getElementById('today-sales-tbody');
+            if (!todaySales.length) {
+                tbody.innerHTML =
+                    '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🛒</div><p>No sales today</p></div></td></tr>';
+                return;
+            }
+            const payBadge = { cash: 'badge-green', card: 'badge-blue', baki: 'badge-red', partial: 'badge-gold' };
+            tbody.innerHTML = todaySales.slice().reverse().map(s => `<tr>
+            <td>${s.time||'–'}</td>
+            <td><strong>${s.customer}</strong></td>
+            <td class="amount-pos">AED ${s.amount.toFixed(2)}</td>
+            <td><span class="badge ${payBadge[s.payment]||'badge-blue'}">${s.payment}</span></td>
+            <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.notes||'–'}</td>
+            <td><button class="btn btn-red btn-sm" onclick="deleteSale(${s.id})">🗑</button></td>
+          </tr>`).join('');
+        }
+
+        // ===================== BAKI =====================
+        function addBakiEntry() {
+            const customer = document.getElementById('baki-customer').value.trim();
+            const amount = parseFloat(document.getElementById('baki-amount').value);
+            const type = document.getElementById('baki-type').value;
+            const date = document.getElementById('baki-date').value;
+            const notes = document.getElementById('baki-notes').value.trim();
+            const phone = document.getElementById('baki-phone').value.trim();
+            const settlementMonth = document.getElementById('baki-settlement-month').value || date.slice(0, 7);
+
+            if (!customer) { toast('Enter customer name', 'red'); return; }
+            if (!amount || amount <= 0) { toast('Enter valid amount', 'red'); return; }
+
+            data.baki.push({
+                id: Date.now(),
+                customer,
+                phone,
+                amount,
+                type,
+                date,
+                notes,
+                settlementMonth,
+                settled: false
+            });
+
+            if (!data.customers.find(c => c.name.toLowerCase() === customer.toLowerCase())) {
+                data.customers.push({ id: Date.now() + 1, name: customer, phone, address: '', notes: '',
+                    date: new Date().toISOString() });
+            }
+
+            save();
+            toast(type === 'baki' ? `Baki AED ${amount.toFixed(2)} added!` : `Payment AED ${amount.toFixed(2)} recorded!`);
+            clearBakiForm();
+            refreshAll();
+        }
+
+        function clearBakiForm() {
+            ['baki-customer', 'baki-phone', 'baki-amount', 'baki-notes'].forEach(id => document.getElementById(id).value =
+            '');
+            document.getElementById('baki-type').value = 'baki';
+        }
+
+        function deleteBaki(id) {
+            if (!confirm('Delete this entry?')) return;
+            data.baki = data.baki.filter(b => b.id !== id);
+            save();
+            toast('Entry deleted', 'red');
+            refreshAll();
+        }
+
+        function renderBaki() {
+            const tbody = document.getElementById('baki-tbody');
+            const names = [...new Set(data.baki.map(b => b.customer))];
+            if (!names.length) {
+                tbody.innerHTML =
+                    '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📋</div><p>No baki records</p></div></td></tr>';
+                return;
+            }
+            let rows = names.map((name, i) => {
+                const entries = data.baki.filter(b => b.customer === name);
+                const bal = getCustomerBalance(name);
+                const last = entries.sort((a, b) => b.date > a.date ? 1 : -1)[0];
+                const cust = data.customers.find(c => c.name === name) || {};
+                return { name, bal, last, cust, i };
+            }).filter(r => r.bal > 0 || data.baki.some(b => b.customer === r.name && b.type === 'payment'));
+
+            if (!rows.length) {
+                tbody.innerHTML =
+                    '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">✅</div><p>All clear – no outstanding baki!</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = rows.map(({ name, bal, last, cust, i }) => {
+                const phone = (last.phone || cust.phone || '').replace(/\s/g, '');
+                const waMsg = encodeURIComponent(
+                    `আসসালামু আলাইকুম ${name} ভাই,\n\nআবদুন নূর গ্রোসারি থেকে জানাচ্ছি —\nআপনার কাছে বর্তমানে *AED ${bal.toFixed(2)}* বাকি আছে।\n\nঅনুগ্রহ করে যত তাড়াতাড়ি সম্ভব পরিশোধ করুন।\n\n---\nDear ${name},\nYou have an outstanding balance of *AED ${bal.toFixed(2)}* at Abdun Nur Grocery.\nKindly arrange payment at your earliest convenience.\n\nThank you 🙏\nAbdun Nur Grocery, Frij Al Murar, Dubai`
+                );
+                const waLink = phone ? `https://wa.me/971${phone.replace(/^0/, '')}?text=${waMsg}` : '#';
+                const settl = data.baki.filter(b => b.customer === name && b.settlementMonth);
+                const lastSettl = settl.length ? settl.sort((a, b) => b.date > a.date ? 1 : -1)[0] : null;
+                return `<tr>
+              <td>${i+1}</td>
+              <td><strong>${name}</strong></td>
+              <td>${last.phone || cust.phone || '–'}</td>
+              <td class="${bal > 0 ? 'amount-neg' : 'amount-pos'}">AED ${bal.toFixed(2)}</td>
+              <td>${last.date} ${lastSettl && lastSettl.settlementMonth ? '📅 '+lastSettl.settlementMonth : ''}</td>
+              <td><span class="badge ${bal > 0 ? 'badge-red' : 'badge-green'}">${bal > 0 ? 'বাকি আছে' : '✅ Clear'}</span></td>
+              <td style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-outline btn-sm" onclick="showCustomerModal('${name}')">👁</button>
+                ${bal > 0 && phone ? `<a href="${waLink}" target="_blank" class="btn btn-sm" style="background:#25D366;color:white;text-decoration:none;">💬 Remind</a>` : bal > 0 ? `<span style="font-size:11px;color:var(--muted);">No phone</span>` : ''}
+              </td>
+            </tr>`;
+            }).join('');
+        }
+
+        function filterBaki(q) {
+            const rows = document.querySelectorAll('#baki-tbody tr');
+            rows.forEach(r => {
+                r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        // ===================== EXPENSES =====================
+        function addExpense() {
+            const amount = parseFloat(document.getElementById('exp-amount').value);
+            const date = document.getElementById('exp-date').value;
+            const category = document.getElementById('exp-category').value;
+            const desc = document.getElementById('exp-desc').value.trim();
+
+            if (!amount || amount <= 0) { toast('Enter valid amount', 'red'); return; }
+            if (!date) { toast('Select date', 'red'); return; }
+
+            data.expenses.push({ id: Date.now(), amount, date, category, desc });
+            save();
+            toast(`Expense AED ${amount.toFixed(2)} added!`);
+            ['exp-amount', 'exp-desc'].forEach(id => document.getElementById(id).value = '');
+            renderExpenses();
+            updateDashboard();
+        }
+
+        function deleteExpense(id) {
+            if (!confirm('Delete expense?')) return;
+            data.expenses = data.expenses.filter(e => e.id !== id);
+            save();
+            toast('Expense deleted', 'red');
+            renderExpenses();
+            updateDashboard();
+        }
+
+        const catEmoji = { rent: '🏠', electricity: '⚡', water: '💧', staff: '👷', stock: '📦', delivery: '🛵', phone: '📱',
+            other: '🔧' };
+
+        function renderExpenses() {
+            const tbody = document.getElementById('exp-tbody');
+            const total = data.expenses.reduce((s, e) => s + e.amount, 0);
+            document.getElementById('exp-total-badge').textContent = `Total: AED ${total.toFixed(2)}`;
+            if (!data.expenses.length) {
+                tbody.innerHTML =
+                    '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">💸</div><p>No expenses recorded</p></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.expenses.slice().reverse().map(e => `<tr>
+            <td>${e.date}</td>
+            <td><span class="badge badge-red">${catEmoji[e.category]||'🔧'} ${e.category}</span></td>
+            <td>${e.desc||'–'}</td>
+            <td class="amount-neg">AED ${e.amount.toFixed(2)}</td>
+            <td><button class="btn btn-red btn-sm" onclick="deleteExpense(${e.id})">🗑</button></td>
+          </tr>`).join('');
+        }
+
+        // ===================== DASHBOARD =====================
+        function updateDashboard() {
+            const today = new Date().toISOString().split('T')[0];
+            const totalSales = data.sales.reduce((s, e) => s + e.amount, 0);
+            const totalBaki = data.baki.filter(b => b.type === 'baki').reduce((s, b) => s + b.amount, 0);
+            const totalCollected = data.baki.filter(b => b.type === 'payment').reduce((s, b) => s + b.amount, 0);
+            const totalExpenses = data.expenses.reduce((s, e) => s + e.amount, 0);
+            const bakiCustomers = [...new Set(data.baki.filter(b => b.type === 'baki').map(b => b.customer))].filter(name =>
+                getCustomerBalance(name) > 0).length;
+            const todaySalesCount = data.sales.filter(s => s.date === today).length;
+
+            document.getElementById('sum-total-sales').textContent = `AED ${totalSales.toFixed(2)}`;
+            document.getElementById('sum-total-baki').textContent = `AED ${(totalBaki - totalCollected).toFixed(2)}`;
+            document.getElementById('sum-collected').textContent = `AED ${totalCollected.toFixed(2)}`;
+            document.getElementById('sum-expenses').textContent = `AED ${totalExpenses.toFixed(2)}`;
+
+            document.getElementById('dash-sales-today').textContent = todaySalesCount;
+            document.getElementById('dash-baki-count').textContent = bakiCustomers;
+            document.getElementById('dash-customers').textContent = getCustomerNames().length;
+            document.getElementById('dash-txn-count').textContent = data.sales.length + data.baki.length;
+
+            const all = [
+                ...data.sales.map(s => ({ date: s.date, customer: s.customer, type: 'Sale', payment: s.payment,
+                    amount: s.amount, notes: s.notes, id: s.id, ts: s.id })),
+                ...data.baki.map(b => ({ date: b.date, customer: b.customer, type: b.type === 'baki' ? 'Baki' :
+                        'Payment', payment: b.type, amount: b.amount, notes: b.notes, id: b.id, ts: b.id }))
+            ].sort((a, b) => b.ts - a.ts).slice(0, 8);
+
+            const tbody = document.getElementById('dash-recent-tbody');
+            if (!all.length) {
+                tbody.innerHTML =
+                    '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No transactions yet</p></div></td></tr>';
+                return;
+            }
+            const badge = { Sale: 'badge-green', Baki: 'badge-red', Payment: 'badge-blue', cash: 'badge-green',
+                card: 'badge-blue', baki: 'badge-red', partial: 'badge-gold' };
+            tbody.innerHTML = all.map(t => `<tr>
+            <td>${t.date}</td>
+            <td><strong>${t.customer}</strong></td>
+            <td><span class="badge ${badge[t.type]}">${t.type}</span></td>
+            <td class="${t.type==='Payment'?'amount-pos':'amount-neg'}">AED ${t.amount.toFixed(2)}</td>
+            <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.notes||'–'}</td>
+          </tr>`).join('');
+        }
+
+        // ===================== REPORTS =====================
+        function generateReport() {
+            const from = document.getElementById('rep-from').value;
+            const to = document.getElementById('rep-to').value;
+            if (!from || !to) { toast('Select date range', 'red'); return; }
+
+            const sales = data.sales.filter(s => s.date >= from && s.date <= to);
+            const bakis = data.baki.filter(b => b.date >= from && b.date <= to);
+            const expenses = data.expenses.filter(e => e.date >= from && e.date <= to);
+
+            const totalSales = sales.reduce((s, e) => s + e.amount, 0);
+            const totalBaki = bakis.filter(b => b.type === 'baki').reduce((s, b) => s + b.amount, 0);
+            const totalCollected = bakis.filter(b => b.type === 'payment').reduce((s, b) => s + b.amount, 0);
+            const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
+            const profit = totalSales + totalCollected - totalExpenses;
+
+            document.getElementById('rep-sales').textContent = `AED ${totalSales.toFixed(2)}`;
+            document.getElementById('rep-baki').textContent = `AED ${totalBaki.toFixed(2)}`;
+            document.getElementById('rep-collected').textContent = `AED ${totalCollected.toFixed(2)}`;
+            document.getElementById('rep-expenses').textContent = `AED ${totalExpenses.toFixed(2)}`;
+            document.getElementById('rep-profit').textContent = `AED ${profit.toFixed(2)}`;
+
+            const all = [
+                ...sales.map(s => ({ date: s.date, customer: s.customer, type: 'Sale', payment: s.payment,
+                    amount: s.amount, notes: s.notes })),
+                ...bakis.map(b => ({ date: b.date, customer: b.customer, type: b.type === 'baki' ? 'Baki' :
+                        'Payment', payment: b.type, amount: b.amount, notes: b.notes }))
+            ].sort((a, b) => b.date > a.date ? -1 : 1);
+
+            const tbody = document.getElementById('rep-tbody');
+            const badge = { Sale: 'badge-green', Baki: 'badge-red', Payment: 'badge-blue' };
+            if (!all.length) {
+                tbody.innerHTML =
+                    '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📊</div><p>No data for this period</p></div></td></tr>';
+                return;
+            }
+            tbody.innerHTML = all.map(t => `<tr>
+            <td>${t.date}</td>
+            <td>${t.customer}</td>
+            <td><span class="badge ${badge[t.type]||'badge-blue'}">${t.type}</span></td>
+            <td class="${t.type==='Payment'?'amount-pos':''}">AED ${t.amount.toFixed(2)}</td>
+            <td>${t.payment}</td>
+            <td>${t.notes||'–'}</td>
+          </tr>`).join('');
+
+            toast('Report generated!');
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        // ===================== SUPPLIERS =====================
+        const supCatEmoji = { grocery: '🛒', vegetables: '🥦', fish: '🐟', dairy: '🥛', oil: '🫙', beverages: '🥤',
+            frozen: '🧊', cleaning: '🧹', other: '📦' };
+
+        function addSupplier() {
+            const name = document.getElementById('sup-name').value.trim();
+            if (!name) { toast('Enter supplier name', 'red'); return; }
+            if (data.suppliers && data.suppliers.find(s => s.name.toLowerCase() === name.toLowerCase())) {
+                toast('Supplier already exists', 'red');
+                return;
+            }
+            if (!data.suppliers) data.suppliers = [];
+            data.suppliers.push({
+                id: Date.now(),
+                name,
+                contact: document.getElementById('sup-contact').value.trim(),
+                phone: document.getElementById('sup-phone').value.trim(),
+                whatsapp: document.getElementById('sup-whatsapp').value.trim(),
+                category: document.getElementById('sup-category').value,
+                area: document.getElementById('sup-area').value.trim(),
+                creditLimit: parseFloat(document.getElementById('sup-credit').value) || 0,
+                terms: document.getElementById('sup-terms').value,
+                notes: document.getElementById('sup-notes').value.trim(),
+                date: new Date().toISOString()
+            });
+            save();
+            toast('Supplier added!');
+            clearSupplierForm();
+            renderSuppliers();
+        }
+
+        function clearSupplierForm() {
+            ['sup-name', 'sup-contact', 'sup-phone', 'sup-whatsapp', 'sup-area', 'sup-credit', 'sup-notes'].forEach(id =>
+                document.getElementById(id).value = '');
+            document.getElementById('sup-category').value = 'grocery';
+            document.getElementById('sup-terms').value = 'cash';
+        }
+
+        function addSupplierPayment() {
+            if (!data.supplierPayments) data.supplierPayments = [];
+            const name = document.getElementById('sup-pay-name').value;
+            const amount = parseFloat(document.getElementById('sup-pay-amount').value);
+            const type = document.getElementById('sup-pay-type').value;
+            const date = document.getElementById('sup-pay-date').value;
+            const notes = document.getElementById('sup-pay-notes').value.trim();
+
+            if (!name) { toast('Select a supplier', 'red'); return; }
+            if (!amount || amount <= 0) { toast('Enter valid amount', 'red'); return; }
+
+            data.supplierPayments.push({ id: Date.now(), supplier: name, amount, type, date, notes });
+            save();
+            toast(type === 'purchase' ? `Purchase AED ${amount.toFixed(2)} recorded!` :
+                `Payment AED ${amount.toFixed(2)} recorded!`);
+            ['sup-pay-amount', 'sup-pay-notes'].forEach(id => document.getElementById(id).value = '');
+            renderSuppliers();
+        }
+
+        function getSupplierBalance(name) {
+            if (!data.supplierPayments) return 0;
+            let bal = 0;
+            data.supplierPayments.filter(p => p.supplier === name).forEach(p => {
+                bal += p.type === 'purchase' ? p.amount : -p.amount;
+            });
+            return Math.max(0, bal);
+        }
+
+        function renderSuppliers() {
+            if (!data.suppliers) data.suppliers = [];
+            if (!data.supplierPayments) data.supplierPayments = [];
+            const grid = document.getElementById('suppliers-grid');
+            const today = new Date().toISOString().split('T')[0];
+
+            const sel = document.getElementById('sup-pay-name');
+            if (sel) {
+                const current = sel.value;
+                sel.innerHTML = '<option value="">-- Select Supplier --</option>' +
+                    data.suppliers.map(s => `<option value="${s.name}" ${s.name===current?'selected':''}>${s.name}</option>`)
+                    .join('');
+            }
+
+            if (!data.suppliers.length) {
+                grid.innerHTML =
+                    '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🏭</div><p>No suppliers added yet</p></div>';
+                return;
+            }
+
+            grid.innerHTML = data.suppliers.map(s => {
+                const payments = data.supplierPayments.filter(p => p.supplier === s.name);
+                const totalPurchase = payments.filter(p => p.type === 'purchase').reduce((t, p) => t + p.amount, 0);
+                const totalPaid = payments.filter(p => p.type === 'payment').reduce((t, p) => t + p.amount, 0);
+                const bal = Math.max(0, totalPurchase - totalPaid);
+
+                const todayPaid = payments.filter(p => p.type === 'payment' && p.date === today).reduce((t, p) => t + p
+                    .amount, 0);
+                const todayPurchase = payments.filter(p => p.type === 'purchase' && p.date === today).reduce((t, p) =>
+                    t + p.amount, 0);
+
+                // Payment history
+                const history = payments.slice().sort((a, b) => b.date > a.date ? 1 : -1).slice(0, 5);
+
+                const phone = (s.whatsapp || s.phone || '').replace(/\s/g, '');
+                const waMsg = encodeURIComponent(
+                    `আসসালামু আলাইকুম,\n\n*${s.name}* সাপ্লায়ারের হিসাব:\n\n🛒 মোট কেনা: AED ${totalPurchase.toFixed(2)}\n✅ মোট দেওয়া হয়েছে: AED ${totalPaid.toFixed(2)}\n⚠️ বাকি আছে: *AED ${bal.toFixed(2)}*\n\n---\nDear ${s.name},\nTotal Purchase: AED ${totalPurchase.toFixed(2)}\nTotal Paid: AED ${totalPaid.toFixed(2)}\nOutstanding Balance: *AED ${bal.toFixed(2)}*\n\nAbdun Nur Grocery, Dubai`
+                );
+                const waLink = phone ? `https://wa.me/971${phone.replace(/^0/, '')}?text=${waMsg}` : '#';
+
+                return `<div class="supplier-card">
+              <div class="sup-name">${supCatEmoji[s.category]||'📦'} ${s.name}</div>
+              <div class="sup-contact">👤 ${s.contact||'–'} &nbsp;|&nbsp; 📍 ${s.area||'–'}</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+                📞 ${s.phone||'–'} ${s.whatsapp ? `· 💬 ${s.whatsapp}` : ''}
+              </div>
+
+              <div style="background:var(--surface);border-radius:10px;padding:10px 12px;margin-bottom:10px;border:1px solid var(--border);">
+                <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">আজকের হিসাব / Today</div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;">
+                  <span>📦 কেনা হয়েছে</span>
+                  <span style="font-weight:700;color:var(--red);">AED ${todayPurchase.toFixed(2)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;">
+                  <span>✅ দেওয়া হয়েছে</span>
+                  <span style="font-weight:700;color:var(--green);">AED ${todayPaid.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:2px;">মোট বাকি / Total Owed</div>
+                  <div class="sup-balance ${bal>0?'owe':'clear'}">AED ${bal.toFixed(2)}</div>
+                  <div style="font-size:11px;color:var(--muted)">${bal>0?'⚠️ আমাদের দিতে হবে':'✅ সব পরিশোধ'}</div>
+                </div>
+                <button class="btn btn-red btn-sm" onclick="deleteSupplier(${s.id})">🗑</button>
+              </div>
+
+              ${history.length ? `<div style="font-size:11px;color:var(--muted);margin-top:6px;border-top:1px solid var(--border);padding-top:6px;">
+                <strong>📜 Recent:</strong> ${history.map(h => `${h.date} ${h.type==='purchase'?'📦':'✅'} AED ${h.amount.toFixed(2)}`).join(' | ')}
+              </div>` : ''}
+
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                ${phone ? `<a href="${waLink}" target="_blank" class="btn btn-sm" style="background:#25D366;color:white;text-decoration:none;flex:1;justify-content:center;">💬 WhatsApp Summary</a>` : '<span style="font-size:11px;color:var(--muted);">No WhatsApp number</span>'}
+              </div>
+
+              <div class="sup-meta">
+                <span class="badge badge-gold">${s.terms}</span>
+                ${s.creditLimit > 0 ? `<span class="badge badge-blue">Limit: AED ${s.creditLimit}</span>` : ''}
+              </div>
+              ${s.notes ? `<div style="font-size:11px;color:var(--muted);margin-top:8px;border-top:1px solid var(--border);padding-top:6px;">${s.notes}</div>` : ''}
+            </div>`;
+            }).join('');
+        }
+
+        function deleteSupplier(id) {
+            if (!confirm('Delete this supplier?')) return;
+            data.suppliers = data.suppliers.filter(s => s.id !== id);
+            save();
+            toast('Supplier deleted', 'red');
+            renderSuppliers();
+        }
+
+        function filterSuppliers(q) {
+            const cards = document.querySelectorAll('.supplier-card');
+            cards.forEach(c => {
+                c.style.display = c.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        // ===================== REMINDERS =====================
+        function saveReminderSettings() {
+            data.reminderSettings = {
+                day1: parseInt(document.getElementById('rem-day1').value) || 2,
+                day2: parseInt(document.getElementById('rem-day2').value) || 10,
+                lang: document.getElementById('rem-lang').value
+            };
+            save();
+            toast('Reminder settings saved!');
+            renderReminders();
+        }
+
+        function renderReminders() {
+            const list = document.getElementById('reminder-list');
+            const tbody = document.getElementById('reminder-history-tbody');
+
+            // Get customers with baki
+            const bakiCustomers = data.baki.filter(b => b.type === 'baki').map(b => b.customer);
+            const unique = [...new Set(bakiCustomers)];
+            const withBal = unique.filter(name => getCustomerBalance(name) > 0);
+
+            if (!withBal.length) {
+                list.innerHTML =
+                    `<div class="empty-state"><div class="empty-icon">🔔</div><p>No outstanding baki – all clear! 🎉</p></div>`;
+                document.getElementById('reminder-badge').textContent = '✅ All clear!';
+                tbody.innerHTML =
+                    '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No reminders sent yet</p></div></td></tr>';
+                return;
+            }
+
+            const settings = data.reminderSettings || { day1: 2, day2: 10, lang: 'both' };
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            // Determine next reminder dates
+            let nextDates = [];
+            [settings.day1, settings.day2].forEach(day => {
+                let d = new Date(currentYear, currentMonth, day);
+                if (d < now) {
+                    d = new Date(currentYear, currentMonth + 1, day);
+                }
+                if (d.getDate() === day) {
+                    nextDates.push(d);
+                }
+            });
+            nextDates.sort((a, b) => a - b);
+
+            const lang = settings.lang || 'both';
+
+            let html = '';
+            withBal.forEach(name => {
+                const bal = getCustomerBalance(name);
+                const cust = data.customers.find(c => c.name === name) || {};
+                const phone = (cust.phone || '').replace(/\s/g, '');
+                const waMsg = encodeURIComponent(
+                    `আসসালামু আলাইকুম ${name} ভাই,\n\nআবদুন নূর গ্রোসারি থেকে জানাচ্ছি —\nআপনার কাছে বর্তমানে *AED ${bal.toFixed(2)}* বাকি আছে।\n\n📅 অনুগ্রহ করে মাসের ${settings.day1} ও ${settings.day2} তারিখের মধ্যে পরিশোধ করুন।\n\nধন্যবাদ 🙏\nআবদুন নূর গ্রোসারি, ফ্রিজ আল মুরার, দুবাই\n\n---\nDear ${name},\nYou have an outstanding balance of *AED ${bal.toFixed(2)}* at Abdun Nur Grocery.\n\n📅 Please pay by the ${settings.day1}th or ${settings.day2}th of this month.\n\nThank you 🙏\nAbdun Nur Grocery, Frij Al Murar, Dubai`
+                );
+                const waLink = phone ? `https://wa.me/971${phone.replace(/^0/, '')}?text=${waMsg}` : '#';
+
+                const bnMsg =
+                    `🧾 ${name} ভাই, আপনার বাকি আছে *AED ${bal.toFixed(2)}*। অনুগ্রহ করে মাসের ${settings.day1} ও ${settings.day2} তারিখের মধ্যে পরিশোধ করুন।`;
+                const enMsg =
+                    `🧾 Dear ${name}, you have *AED ${bal.toFixed(2)}* outstanding. Please pay by the ${settings.day1}th or ${settings.day2}th of this month.`;
+
+                let msg = '';
+                if (lang === 'both') msg = `${bnMsg}<br><span style="font-size:12px;color:var(--muted);">${enMsg}</span>`;
+                else if (lang === 'bn') msg = bnMsg;
+                else msg = enMsg;
+
+                const nextDate = nextDates.length ? nextDates[0].toLocaleDateString() : 'Soon';
+
+                html += `<div class="reminder-item">
+              <div class="reminder-msg">
+                <div class="bn">${msg}</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;">📅 Next reminder: ${nextDate}</div>
+              </div>
+              <div class="reminder-actions">
+                ${phone ? `<a href="${waLink}" target="_blank" class="btn btn-sm" style="background:#25D366;color:white;text-decoration:none;">💬 Send</a>` : ''}
+                <button class="btn btn-sm btn-green" onclick="markBakiSettled('${name}')">✅ Settled</button>
+                <button class="btn btn-sm btn-outline" onclick="showCustomerModal('${name}')">👁 History</button>
+              </div>
+            </div>`;
+            });
+
+            list.innerHTML = html;
+
+            // Reminder history
+            if (data.reminders && data.reminders.length) {
+                tbody.innerHTML = data.reminders.slice().reverse().slice(0, 20).map(r => `<tr>
+              <td>${r.date}</td>
+              <td>${r.customer}</td>
+              <td><span class="badge badge-gold">${r.type}</span></td>
+              <td><span class="badge badge-green">Sent</span></td>
+              <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.message}</td>
+            </tr>`).join('');
+            } else {
+                tbody.innerHTML =
+                    '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No reminders sent yet</p></div></td></tr>';
+            }
+
+            document.getElementById('reminder-badge').textContent =
+                `📅 Next: ${settings.day1}th & ${settings.day2}th of each month · ${withBal.length} customers`;
+        }
+
+        function markBakiSettled(name) {
+            if (!confirm(`Mark ${name}'s baki as settled for this month?`)) return;
+            const now = new Date();
+            const month = now.toISOString().slice(0, 7);
+            // Find unsettled baki entries for this customer
+            let updated = false;
+            data.baki.forEach(b => {
+                if (b.customer === name && b.type === 'baki' && !b.settled) {
+                    b.settled = true;
+                    b.settledDate = now.toISOString();
+                    b.settlementMonth = month;
+                    updated = true;
+                }
+            });
+            if (updated) {
+                save();
+                toast(`${name}'s baki marked as settled for ${month}!`, 'green');
+                renderReminders();
+                refreshAll();
+            } else {
+                toast('No unsettled baki found for ' + name, 'red');
+            }
+        }
+
+        function sendBulkReminders() {
+            const settings = data.reminderSettings || { day1: 2, day2: 10, lang: 'both' };
+            const bakiCustomers = data.baki.filter(b => b.type === 'baki').map(b => b.customer);
+            const unique = [...new Set(bakiCustomers)];
+            const withBal = unique.filter(name => getCustomerBalance(name) > 0);
+
+            if (!withBal.length) {
+                toast('No outstanding baki to remind', 'red');
+                return;
+            }
+
+            const lang = settings.lang || 'both';
+            let count = 0;
+
+            withBal.forEach(name => {
+                const bal = getCustomerBalance(name);
+                const cust = data.customers.find(c => c.name === name) || {};
+                const phone = (cust.phone || '').replace(/\s/g, '');
+
+                let msg = '';
+                if (lang === 'both') {
+                    msg =
+                        `${name} ভাই, আপনার বাকি আছে AED ${bal.toFixed(2)}। মাসের ${settings.day1} ও ${settings.day2} তারিখের মধ্যে পরিশোধ করুন। Dear ${name}, you owe AED ${bal.toFixed(2)}. Please pay by ${settings.day1}th or ${settings.day2}th.`;
+                } else if (lang === 'bn') {
+                    msg = `${name} ভাই, আপনার বাকি আছে AED ${bal.toFixed(2)}। মাসের ${settings.day1} ও ${settings.day2} তারিখের মধ্যে পরিশোধ করুন।`;
+                } else {
+                    msg =
+                    `Dear ${name}, you owe AED ${bal.toFixed(2)}. Please pay by ${settings.day1}th or ${settings.day2}th of this month.`;
+                }
+
+                // Log reminder
+                if (!data.reminders) data.reminders = [];
+                data.reminders.push({
+                    id: Date.now() + count,
+                    customer: name,
+                    type: 'Bulk Reminder',
+                    date: new Date().toISOString().slice(0, 10),
+                    message: msg,
+                    phone: phone || 'No phone'
+                });
+
+                // WhatsApp link
+                if (phone) {
+                    const waMsg = encodeURIComponent(
+                        `আসসালামু আলাইকুম ${name} ভাই,\n\nআবদুন নূর গ্রোসারি থেকে জানাচ্ছি —\nআপনার কাছে বর্তমানে *AED ${bal.toFixed(2)}* বাকি আছে।\n\n📅 অনুগ্রহ করে মাসের ${settings.day1} ও ${settings.day2} তারিখের মধ্যে পরিশোধ করুন।\n\nধন্যবাদ 🙏\nআবদুন নূর গ্রোসারি, ফ্রিজ আল মুরার, দুবাই\n\n---\nDear ${name},\nYou have an outstanding balance of *AED ${bal.toFixed(2)}* at Abdun Nur Grocery.\n\n📅 Please pay by the ${settings.day1}th or ${settings.day2}th of this month.\n\nThank you 🙏\nAbdun Nur Grocery, Frij Al Murar, Dubai`
+                    );
+                    const link = `https://wa.me/971${phone.replace(/^0/, '')}?text=${waMsg}`;
+                    window.open(link, '_blank');
+                }
+                count++;
+            });
+
+            save();
+            toast(`✅ ${count} reminder(s) prepared! WhatsApp links opened.`, 'green');
+            renderReminders();
+        }
+
+        // ===================== REFRESH ALL =====================
+        function refreshAll() {
+            updateDashboard();
+            renderTodaySales();
+            renderBaki();
+            renderCustomers();
+            renderExpenses();
+            renderSuppliers();
+            updateDatalist();
+            // Don't auto-render reminders to avoid loop
+        }
+
+        // Modal close on overlay click
+        document.getElementById('customerModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // Auto-refresh every 30s
+        setInterval(() => {
+            if (sessionStorage.getItem('loggedIn') === 'true') {
+                refreshAll();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
+```
